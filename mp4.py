@@ -9,6 +9,7 @@ import time
 import requests
 from tqdm import trange
 import moviepy.editor
+from pathlib import Path
 # from cap_from_youtube import cap_from_youtube
 
 
@@ -118,34 +119,15 @@ def pull_from_google_drive():
     return file_names
 
 if __name__ == "__main__":
-    # process_video_frame_by_frame("/root/climp.mp4")
-    # mp4_merge()
-    os.chdir("/root")
+    os.chdir(str(Path.home()))
     # file_names = pull_from_premiumize()
     drive_file_names = pull_from_google_drive()
     # Because we may be running this on a VPS with little disk space, we will download one file at a time, process it,
     # and then delete it before moving on to the next file
-    # for file_name in file_names:
-    #     # subprocess.run(["rclone", "copy", "premiumize:climps/" + file_name, "/root", "-P"])
-    #     subprocess.run(["rclone", "copy", "premiumize:climps/" + file_name, "/root", "-P"])
-    #     # process_video_frame_by_frame("/root/" + file_name)
-    #     process_video_frame_by_frame(file_name)
-    #     subprocess.run(["rm", "/root/" + file_name])
-    #     mp4_merge()
-    #     for file in os.listdir("."):
-    #         if "joined" in file:
-    #             subprocess.run(["rclone", "copy", file, "premiumize:climps/", "-P"])
-    #             subprocess.run(["rm", file])
-    #             break
-    #     subprocess.run(["rclone", "delete", "premiumize:climps/" + file_name, "-P"])
-    #     subprocess.run(["rm", "-rf", "*.mp4"])
     for file_name in drive_file_names:
-        # subprocess.run(["rclone", "copy", "gdrive:Downloads/climps/" + file_name, "/root/", "-P"])
-        subprocess.run(["rclone", "copy", "google:Downloads/climps/" + file_name, "/root", "-P"])
-        # process_video_frame_by_frame("/root/" + file_name)
+        subprocess.run(["rclone", "copy", "google:Downloads/climps/" + file_name, str(Path.home()), "-P"])
         process_video_frame_by_frame(file_name)
-        # subprocess.run(["rm", "/root/" + file_name])
-        subprocess.run(["rm", "/root/" + file_name])
+        subprocess.run(["rm", str(Path.home()) + "/" + file_name])
         mp4_merge()
         for file in os.listdir("."):
             if "joined" in file:
