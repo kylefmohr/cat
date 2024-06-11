@@ -82,9 +82,9 @@ def process_video_frame_by_frame(video_path: str, start_frame: int = 0):
 def mp4_merge():
     if subprocess.run(["which", "mp4_merge"]).returncode != 0:
         if subprocess.run(["uname", "-p"]).stdout == "aarch64":
-            os.system("wget https://github.com/gyroflow/mp4-merge/releases/download/v0.1.8/mp4_merge-linux-arm64 -O /usr/bin/mp4_merge && chmod +x /usr/bin/mp4_merge")
+            os.system("sudo wget https://github.com/gyroflow/mp4-merge/releases/download/v0.1.8/mp4_merge-linux-arm64 -O /usr/bin/mp4_merge && sudo chmod +x /usr/bin/mp4_merge")
         else:
-            os.system("wget https://github.com/gyroflow/mp4-merge/releases/download/v0.1.8/mp4_merge-linux64 -O /usr/bin/mp4_merge && chmod +x /usr/bin/mp4_merge")
+            os.system("sudo wget https://github.com/gyroflow/mp4-merge/releases/download/v0.1.8/mp4_merge-linux64 -O /usr/bin/mp4_merge && sudo chmod +x /usr/bin/mp4_merge")
     command = "mp4_merge "
     files = []
     for file in os.listdir("."):
