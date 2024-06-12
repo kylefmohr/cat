@@ -130,10 +130,12 @@ if __name__ == "__main__":
         subprocess.run(["rm", str(Path.home()) + "/" + file_name])
         mp4_merge()
         for file in os.listdir("."):
-            if "joined" in file:
+            if ".mp4" in file:
                 subprocess.run(["rclone", "copy", file, "google:Downloads/climps/", "-P"])
+            # if "joined" in file:
+            #     subprocess.run(["rclone", "copy", file, "google:Downloads/climps/", "-P"])
 
-                subprocess.run(["rm", file])
-                break
+            #     subprocess.run(["rm", file])
+            #     break
         subprocess.run(["rclone", "delete", "google:Downloads/climps/" + file_name, "-P"])
         subprocess.run(["rm", "-rf", "*.mp4"])
