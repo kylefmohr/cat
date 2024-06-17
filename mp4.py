@@ -118,24 +118,51 @@ def pull_from_google_drive():
 
     return file_names
 
+def pull_via_yt_dlp(url: str):
+    if subprocess.run(["which", "yt-dlp"]).returncode != 0:
+        os.system("pip install yt-dlp")
+    if subprocess.run(["which", "ffmpeg"]).returncode != 0:
+        os.system("sudo apt-get install ffmpeg")
+    if subprocess.run(["which", "aria2c"]).returncode != 0:
+        os.system("sudo apt-get install aria2")
+    for url in urls:
+        filename = url.split("/")[-1] + ".mp4"
+        subprocess.run(["yt-dlp", "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]", url, "--external-downloader", "aria2c", "-o", filename])
+
+
 if __name__ == "__main__":
     os.chdir(str(Path.home()))
+    try:
+        with open("urls.txt") as f:
+            urls = f.readlines()
+    except FileNotFoundError:
+        urls = []
+    if urls:
+        for url in urls:
+            file = pull_via_yt_dlp(url)
+            process_video_frame_by_frame(file)
+            mp4_merge()
+            for file in os.listdir("."):
+                if "joined" in file:
+                    subprocess.run(["rclone", "copy", file, "google:Downloads/climps/", "-P"])
+                    break
+            subprocess.run(["rm", "-rf", "*.mp4"])
     # file_names = pull_from_premiumize()
-    drive_file_names = pull_from_google_drive()
-    # Because we may be running this on a VPS with little disk space, we will download one file at a time, process it,
-    # and then delete it before moving on to the next file
-    for file_name in drive_file_names:
-        subprocess.run(["rclone", "copy", "google:Downloads/climps/" + file_name, str(Path.home()), "-P"])
-        process_video_frame_by_frame(file_name)
-        subprocess.run(["rm", str(Path.home()) + "/" + file_name])
-        mp4_merge()
-        for file in os.listdir("."):
-            if ".mp4" in file:
-                subprocess.run(["rclone", "copy", file, "google:Downloads/climps/", "-P"])
-            # if "joined" in file:
-            #     subprocess.run(["rclone", "copy", file, "google:Downloads/climps/", "-P"])
+    # drive_file_names = pull_from_google_drive()
+    # # Because we may be running this on a VPS with little disk space, we will download one file at a time, process it,
+    # # and then delete it before moving on to the next file
+    # for file_name in drive_file_names:
+    #     subprocess.run(["rclone", "copy", "google:Downloads/climps/" + file_name, str(Path.home()), "-P"])
+    #     process_video_frame_by_frame(file_name)
+    #     subprocess.run(["rm", str(Path.home()) + "/" + file_name])
+    #     mp4_merge()
+    #     for file in os.listdir("."):
+    #         if ".mp4" in file:
+    #             subprocess.run(["rclone", "copy", file, "google:Downloads/climps/", "-P"])
+    #         # if "joined" in file:
+    #         #     subprocess.run(["rclone", "copy", file, "google:Downloads/climps/", "-P"])
 
-            #     subprocess.run(["rm", file])
-            #     break
-        subprocess.run(["rclone", "delete", "google:Downloads/climps/" + file_name, "-P"])
-        subprocess.run(["rm", "-rf", "*.mp4"])
+    #         #     subprocess.run(["rm", file])
+    #         #     break
+    #     subprocess.run(["rclone", "delete", "google:Downloads/climps/" + file_name, "-P"])
+    #     subprocess.run(["rm", "-rf", "*.mp4"])
